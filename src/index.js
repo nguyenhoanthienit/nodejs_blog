@@ -3,6 +3,10 @@ const PATH = require("path");
 const port = 3000;
 const morgan = require("morgan");
 const { engine } = require("express-handlebars");
+const db = require("./config/db")
+
+// connect db
+db.connect();
 
 // use express
 const app = express();
@@ -18,9 +22,11 @@ app.use(express.static(PATH.join(__dirname, "public")));
 app.use(morgan("combined"));
 
 // middleware
-app.use(express.urlencoded({
-  extended: true
-}));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 app.use(express.json());
 
 // template engine
@@ -32,7 +38,7 @@ app.set("view engine", ".hbs");
 app.set("views", PATH.join(__dirname, "resources/views"));
 
 // routes
-const route = require("./routes")
+const route = require("./routes");
 route(app);
 
 // listening
