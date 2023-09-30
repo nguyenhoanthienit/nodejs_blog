@@ -17,24 +17,25 @@ app.use(express.static(PATH.join(__dirname, "public")));
 // http logger
 app.use(morgan("combined"));
 
+// middleware
+app.use(express.urlencoded({
+  extended: true
+}));
+app.use(express.json());
+
 // template engine
 // app.engine("handlebars", engine());
 // app.set("view engine", "handlebars");
-
 app.engine(".hbs", engine({ extname: ".hbs" }));
 app.set("view engine", ".hbs");
 
 app.set("views", PATH.join(__dirname, "resources/views"));
 
 // routes
-app.get("/", (req, res) => {
-  res.render("home");
-});
+const route = require("./routes")
+route(app);
 
-app.get("/news", (req, res) => {
-  res.render("news");
-});
-
+// listening
 app.listen(port, () =>
   console.log(`Example app listening on port http://localhost:${port}`)
 );
