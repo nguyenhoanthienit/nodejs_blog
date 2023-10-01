@@ -1,16 +1,16 @@
 const Course = require("../models/Course");
-
+const { multipleMongooseToObject } = require("../../util/mongoose");
 class SiteController {
   // GET /
-  index(req, res) {
-    // res.render("home");
+  index(req, res, next) {
     Course.find()
-      .then(function (models) {
-        res.json(models);
+      .then((courses) => {
+        res.render("home", {
+          // if not toObject, no data can be get -> add toObject to fix the err of handlebars
+          courses: multipleMongooseToObject(courses),
+        });
       })
-      .catch(function (err) {
-        console.log("fail to get data");
-      });
+      .catch(next);
   }
 
   // GET /search

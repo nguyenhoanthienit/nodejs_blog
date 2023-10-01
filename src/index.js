@@ -12,14 +12,13 @@ db.connect();
 const app = express();
 
 // serve static files
-console.log(__dirname);
 app.use(express.static(PATH.join(__dirname, "public")));
 
 // use css
 // add watch to package json and add --watch
 
 // http logger
-app.use(morgan("combined"));
+// app.use(morgan("combined"));
 
 // middleware
 app.use(

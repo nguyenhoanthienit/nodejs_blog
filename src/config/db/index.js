@@ -4,7 +4,7 @@ async function connect() {
   try {
     await mongoose
       .connect("mongodb://localhost:27017/roselia_dev")
-      .then(() => console.log("Connected!"));
+      .then(() => console.log("Mongo Connected!"));
   } catch (error) {
     console.log(error);
   }
