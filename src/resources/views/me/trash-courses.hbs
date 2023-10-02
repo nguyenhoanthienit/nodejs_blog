@@ -1,0 +1,100 @@
+<div class="mt4">
+    <div>
+        <h1>Deleted Courses</h1>
+        <a href="/me/stored/courses">My Courses</a>
+    </div>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th></th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Deleted At</th>
+                <th scope="col" colspan="3"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each courses}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.updatedAt}}</td>
+                <td>
+                    <a href="" type="button" class="btn btn-info btn-restore" data-id="{{this._id}}">Restore</a>
+                </td>
+                <td>
+                    <a href="" type="button" class="btn btn-danger" data-id="{{this._id}}" data-toggle="modal"
+                        data-target="#permanentDeleteCourseModal">Permanent Delete</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4">
+                    No deleted courses
+                </td>
+            </tr>
+
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+{{!-- Delete Modal --}}
+<div class="modal fade" id="permanentDeleteCourseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Permanent delete course</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                100% Sure ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="btnPermanentDeleteCourse" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{!-- HIDDEN form for delete --}}
+<form method="POST" name="permanentDeleteCourseForm"></form>
+
+{{!-- HIDDEN form for restore --}}
+<form method="POST" name="restoreCourseForm"></form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var courseId;
+        var permanentDeleteCourseForm = document.forms['permanentDeleteCourseForm'];
+        var restoreCourseForm = document.forms['restoreCourseForm'];
+        var btnPermanentDeleteCourse = document.getElementById("btnPermanentDeleteCourse");
+        var btnRestoreCourse = $('.btn-restore');
+
+        // only load when DOM finish load
+        $('#permanentDeleteCourseModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget) // Button that triggered the modal
+            courseId = button.data('id') // Extract info from data-* attributes
+        })
+
+        // delete course
+        btnPermanentDeleteCourse.onclick = function () {
+            permanentDeleteCourseForm.action = "/courses/" + courseId + "/force?_method=DELETE";
+            permanentDeleteCourseForm.submit();
+        }
+
+        // restore course
+        btnRestoreCourse.click(function(e){
+            e.preventDefault();
+            var restoredCourseId = $(this).data('id');
+            console.log(restoredCourseId)
+            restoreCourseForm.action = "/courses/" + restoredCourseId + "/restore?_method=PATCH";
+            restoreCourseForm.submit();
+        });
+    })
+</script>

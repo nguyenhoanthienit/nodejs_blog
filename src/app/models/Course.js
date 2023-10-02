@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
-
-mongoose.plugin(slug);
+const mongooseDelete = require("mongoose-delete");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
@@ -26,6 +25,10 @@ const Course = new Schema(
     timestamps: true,
   }
 );
+
+// add plugin
+mongoose.plugin(slug);
+Course.plugin(mongooseDelete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("Course", Course);
 // => "Course" will be converted auto -> courses (plural, lower case) -> to be the same in Mongo
