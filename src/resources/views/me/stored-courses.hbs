@@ -1,61 +1,60 @@
-<div class="mt-4">
+<form class="mt-4" name="container-form" method="POST" action="/courses/handle-form-actions">
     <div>
         <h1>My Courses</h1>
         <a href="/me/trash/courses">Recycle Bin ({{deletedCount}})</a>
         <div class="mt-4 d-flex align-items-center">
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                <label class="form-check-label" for="defaultCheck1">
+                <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+                <label class="form-check-label" for="checkbox-all">
                     Select All
                 </label>
             </div>
-            <select class="form-control form-control-sm checkbox-select-all-options" id="">
-                <option value="delete">--Select action--</option>
+            <select class="form-control form-control-sm checkbox-select-all-options" name="action" required="required">
+                <option value="">-- Select action --</option>
                 <option>Delete</option>
-                <option></option>
-                <option>4</option>
-                <option>5</option>
             </select>
-            <button class="btn btn-primary btn-sm">Execute</button>
+            <button type="submit" class="btn btn-primary btn-sm btn-exc" disabled>Execute</button>
         </div>
     </div>
-</div>
-<table class="table mt-4">
-    <thead>
-        <tr>
-            <th></th>
-            <th scope="col">Name</th>
-            <th scope="col">Description</th>
-            <th scope="col">Updated At</th>
-            <th scope="col" colspan="3"></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{#each courses}}
-        <tr>
-            <th scope="row">{{sum @index 1}}</th>
-            <td>{{this.name}}</td>
-            <td>{{this.description}}</td>
-            <td>{{this.updatedAt}}</td>
-            <td>
-                <a href="/courses/{{this._id}}/edit" type="button" class="btn btn-primary">Edit</a>
-            </td>
-            <td>
-                <a href="" type="button" class="btn btn-danger" data-id="{{this._id}}" data-toggle="modal"
-                    data-target="#deleteCourseModal">Delete</a>
-            </td>
-        </tr>
-        {{else}}
-        <tr>
-            <td colspan="4">No courses available.<br />
-                <a href="/courses/create">Create course</a>
-            </td>
-        </tr>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th></th>
+                <th>#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Updated At</th>
+                <th scope="col" colspan="3"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each courses}}
+            <tr>
+                <td><input class="form-check-input" type="checkbox" value="{{this._id}}" name="courseIds[]"></td>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.description}}</td>
+                <td>{{this.updatedAt}}</td>
+                <td>
+                    <a href="/courses/{{this._id}}/edit" type="button" class="btn btn-primary">Edit</a>
+                </td>
+                <td>
+                    <a href="" type="button" class="btn btn-danger" data-id="{{this._id}}" data-toggle="modal"
+                        data-target="#deleteCourseModal">Delete</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4">No courses available.<br />
+                    <a href="/courses/create">Create course</a>
+                </td>
+            </tr>
 
-        {{/each}}
-    </tbody>
-</table>
-</div>
+            {{/each}}
+        </tbody>
+    </table>
+</form>
+
 
 {{!-- Delete Modal --}}
 <div class="modal fade" id="deleteCourseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -84,12 +83,19 @@
 
 
 <script>
+    // only load when DOM finish load
     document.addEventListener('DOMContentLoaded', function () {
         var courseId;
         var deleteCourseForm = document.forms['deleteCourseForm']
         var btnDeleteCourse = document.getElementById("btnDeleteCourse");
 
-        // only load when DOM finish load
+        var checkboxAll = $('#checkbox-all');
+        var courseItemCheckbox = $('input[name="courseIds[]"]');
+        var btnExc = $('.btn-exc');
+
+        // var containerForm = document.forms['container-form'];
+        var containerForm = $('form[name="container-form"]');
+
         $('#deleteCourseModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget) // Button that triggered the modal
             courseId = button.data('id') // Extract info from data-* attributes
@@ -98,6 +104,37 @@
         btnDeleteCourse.onclick = function () {
             deleteCourseForm.action = "/courses/" + courseId + "?_method=DELETE";
             deleteCourseForm.submit();
+        }
+
+        // select all checkbox
+        checkboxAll.change(function () {
+            var isCheckedAll = $(this).prop('checked');
+            courseItemCheckbox.prop('checked', isCheckedAll);
+            renderCheckAllExcBtn();
+        })
+
+        // click one checkbox
+        courseItemCheckbox.change(function () {
+            var isCheckedAll = courseItemCheckbox.length === $('input[name="courseIds[]"]:checked').length;
+            checkboxAll.prop('checked', isCheckedAll);
+            renderCheckAllExcBtn();
+        })
+
+        // check all exc btn click
+        btnExc.click(function (e) {
+            e.preventDefault();
+            containerForm.submit();
+        })
+
+        // re-render check all exc btn
+        function renderCheckAllExcBtn() {
+            var checkedCount = $('input[name="courseIds[]"]:checked').length;
+            if (checkedCount > 0) {
+                btnExc.removeAttr('disabled', false);
+            }
+            else {
+                btnExc.attr('disabled', true);
+            }
         }
     })
 </script>
