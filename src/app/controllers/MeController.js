@@ -4,14 +4,16 @@ class MeController {
   // GET stored/courses
   storedCourses(req, res, next) {
     Promise.all([
-      Course.find({}),
+      Course.find({}).sortable(req),
       Course.countDocumentsWithDeleted({ deleted: true }),
-    ]).then(([courses, deletedCount]) =>
-      res.render("me/stored-courses", {
-        deletedCount,
-        courses: multipleMongooseToObject(courses),
-      })
-    ).catch(next);
+    ])
+      .then(([courses, deletedCount]) =>
+        res.render("me/stored-courses", {
+          deletedCount,
+          courses: multipleMongooseToObject(courses),
+        })
+      )
+      .catch(next);
   }
 
   // GET /me/trash/courses

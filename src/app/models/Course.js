@@ -5,7 +5,7 @@ const mongooseDelete = require("mongoose-delete");
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
-const Course = new Schema(
+const CourseSchema = new Schema(
   {
     name: { type: String, default: "Default course" },
     description: {
@@ -26,9 +26,20 @@ const Course = new Schema(
   }
 );
 
+// query helper for sortable
+CourseSchema.query.sortable = function (req) {
+  if (req.query.hasOwnProperty("_sort")) {
+    const invalidType = ["asc", "desc"].includes(req.query.type);
+    return this.sort({
+      [req.query.column]: invalidType ? req.query.type : "asc",
+    });
+  }
+  return this;
+};
+
 // add plugin
 mongoose.plugin(slug);
-Course.plugin(mongooseDelete, { overrideMethods: "all" });
+CourseSchema.plugin(mongooseDelete, { overrideMethods: "all" });
 
-module.exports = mongoose.model("Course", Course);
+module.exports = mongoose.model("Course", CourseSchema);
 // => "Course" will be converted auto -> courses (plural, lower case) -> to be the same in Mongo

@@ -5,6 +5,8 @@ const morgan = require("morgan");
 const { engine } = require("express-handlebars");
 const db = require("./config/db");
 const methodOverride = require('method-override')
+const sortMiddleware = require('./app/middleware/sortMiddleware');
+const handlebarsHelper = require('./helpers/handlebars')
 
 // connect db
 db.connect();
@@ -32,6 +34,9 @@ app.use(express.json());
 // override with POST having ?_method=DELETE
 app.use(methodOverride('_method'))
 
+// middleware
+app.use(sortMiddleware);
+
 // template engine
 // app.engine("handlebars", engine());
 // app.set("view engine", "handlebars");
@@ -39,9 +44,7 @@ app.engine(
   ".hbs",
   engine({
     extname: ".hbs",
-    helpers: {
-      sum: (a, b) => a + b,
-    },
+    helpers: handlebarsHelper
   })
 );
 app.set("view engine", ".hbs");
