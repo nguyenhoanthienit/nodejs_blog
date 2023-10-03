@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/nguyenhoanthienit/nodejs_blog#readme",
   "dependencies": {
+    "@alec016/mongoose-autoincrement": "^1.5.1",
     "express": "^4.18.2",
     "express-handlebars": "^7.1.2",
     "method-override": "^3.0.0",

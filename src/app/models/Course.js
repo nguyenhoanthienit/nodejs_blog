@@ -1,12 +1,14 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-updater");
 const mongooseDelete = require("mongoose-delete");
+const autoIncrement = require("@alec016/mongoose-autoincrement");
 
 const Schema = mongoose.Schema;
 const ObjectId = Schema.ObjectId;
 
 const CourseSchema = new Schema(
   {
+    // _id: { type: Number },
     name: { type: String, default: "Default course" },
     description: {
       type: String,
@@ -22,6 +24,7 @@ const CourseSchema = new Schema(
     slug: { type: String, slug: "name", unique: true },
   },
   {
+    _id: false,
     timestamps: true,
   }
 );
@@ -38,7 +41,9 @@ CourseSchema.query.sortable = function (req) {
 };
 
 // add plugin
+autoIncrement.initialize(mongoose.connection);
 mongoose.plugin(slug);
+CourseSchema.plugin(autoIncrement.plugin, { startAt: 1, model: "Course" });
 CourseSchema.plugin(mongooseDelete, { overrideMethods: "all" });
 
 module.exports = mongoose.model("Course", CourseSchema);

@@ -20,13 +20,11 @@ class CourseController {
 
   // POST courses/store
   store(req, res, next) {
-    const formData = { ...req.body };
-    // formData.image = ""'
-    const course = new Course(formData);
+    const course = new Course(req.body);
     course
       .save()
       .then(() => res.redirect("/me/stored/courses"))
-      .catch((err) => {});
+      .catch(next);
   }
 
   // GET courses/:id/edit -> bind data to UI
